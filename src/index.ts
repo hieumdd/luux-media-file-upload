@@ -4,7 +4,7 @@ import { http } from '@google-cloud/functions-framework';
 import { parse } from 'csv-parse/sync';
 import standardFormidable from 'formidable';
 const formidable: typeof standardFormidable = require('formidable-serverless');
-import Joi from 'Joi';
+import Joi from 'joi';
 import dayjs from 'dayjs';
 
 import { load } from './bigquery/bigquery.service';
@@ -32,7 +32,7 @@ app.post('/upload', (req, res) => {
         .then((data) => {
             const timestampSchema = Joi.string()
                 .empty('')
-                .custom((value) => {
+                .custom((value: string) => {
                     return value ? dayjs(value).format('YYYY-MM-DDTHH:mm:ss') : null;
                 });
 
