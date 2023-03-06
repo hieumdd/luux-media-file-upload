@@ -1,0 +1,55 @@
+name: Cloud Functions
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency: ${{ github.ref }}
+
+env:
+  PROJECT_ID: luux-media
+  GCP_SA: etl-158@luux-media.iam.gserviceaccount.com
+
+  FUNCTION_NAME: luux-media-file-upload-${{ github.ref_name }}
+  PUBLIC_URL: https://us-central1-luux-media.cloudfunctions.net/luux-media-file-upload-${{ github.ref_name }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: tsc --project tsconfig.build.json
+
+      - run: |
+          cp package.json dist/package.json
+          cp package-lock.json dist/package-lock.json
+          cp *.html dist/
+
+      - uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v0
+
+      - run: >-
+          gcloud functions deploy ${{ env.FUNCTION_NAME }}
+          --entry-point=main
+          --source=dist
+          --region=us-central1
+          --timeout=120
+          --memory=512MB
+          --runtime=nodejs16
+          --trigger-http
+          --no-user-output-enabled
+          --allow-unauthenticated
+          --service-account=${{ env.GCP_SA }}
+          --env-vars-file=${{ env.ENV_FILE }}
+          --allow-unauthenticated
