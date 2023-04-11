@@ -1,13 +1,16 @@
 import { readFileSync } from 'node:fs';
-import express from 'express';
-import { http } from '@google-cloud/functions-framework';
 import { parse } from 'csv-parse/sync';
+import express from 'express';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { http } from '@google-cloud/functions-framework';
+import Joi from 'joi';
 import standardFormidable from 'formidable';
 const formidable: typeof standardFormidable = require('formidable-serverless');
-import Joi from 'joi';
-import dayjs from 'dayjs';
 
 import { load } from './bigquery/bigquery.service';
+
+dayjs.extend(customParseFormat);
 
 const app = express();
 
@@ -33,7 +36,8 @@ app.post('/upload', (req, res) => {
             const timestampSchema = Joi.string()
                 .empty('')
                 .custom((value: string) => {
-                    return value ? dayjs(value).format('YYYY-MM-DDTHH:mm:ss') : null;
+                    const dt = dayjs(value, 'DD/MM/YYYY HH:mm');
+                    return dt.isValid() ? dt.format('YYYY-MM-DDTHH:mm:ss') : null;
                 });
 
             const schema = Joi.object({
