@@ -18,13 +18,25 @@
     <body>
         <div class="container-sm pt-5">
             <div class="mx-auto">
-                <form action="/upload" enctype="multipart/form-data" method="POST">
+                <form enctype="multipart/form-data" method="POST">
                     <div class="d-flex gap-2">
-                        <input type="file" name="csv-file" id="csv-file" class="form-control" />
+                        <input
+                            type="file"
+                            name="csv-file"
+                            required
+                            id="csv-file"
+                            class="form-control"
+                        />
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
             </div>
         </div>
     </body>
+    <script>
+        (() => {
+            const actionURL = new URL('upload', window.location.href);
+            document.querySelector('form').setAttribute('action', actionURL);
+        })();
+    </script>
 </html>
