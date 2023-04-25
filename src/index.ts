@@ -83,7 +83,7 @@ app.post('/upload', (req, res) => {
                 .rename('First Page Seen', 'first_page_seen')
                 .rename('Associated Company IDs', 'associated_comapny_ids');
 
-            return data.map((row) => Joi.attempt(row, schema));
+            return data.map((row) => Joi.attempt(row, schema, { stripUnknown: true }));
         })
         .then((data) => {
             const schema = [
