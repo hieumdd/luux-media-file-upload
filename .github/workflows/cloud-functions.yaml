@@ -46,7 +46,7 @@ jobs:
           --region=us-central1
           --timeout=120
           --memory=512MB
-          --runtime=nodejs16
+          --runtime=nodejs18
           --trigger-http
           --no-user-output-enabled
           --allow-unauthenticated
